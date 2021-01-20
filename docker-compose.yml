@@ -1,0 +1,16 @@
+version: "3.4"
+
+x-base: &base
+  stdin_open: true
+  tty: true
+  tmpfs:
+    - /tmp
+
+services:
+  search-api:
+    <<: *base
+    image: loadimpact/k6
+    network_mode: host
+    command: "run /scripts/search-api.js"
+    volumes:
+      - ./scripts:/scripts:ro

@@ -9,8 +9,9 @@ export let options = {
     { duration: '10m', target: 50 }, // stay at 50 users for 10 minutes
     { duration: '5m', target: 0 }, // ramp-down to 0 users
   ],
+  gracefulRampDown: '60s',
   thresholds: {
-    http_req_duration: ['p(99)<35000'], // 99% of requests must complete below 35s
+    http_req_duration: ['p(99)<50000'], // 99% of requests must complete below 50s
     errors: ['rate<0.01'], // <1% errors
     hotels: ['rate>0'], // hotels availability always>0
   },

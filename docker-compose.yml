@@ -14,3 +14,11 @@ services:
     command: "run /scripts/search-api.js"
     volumes:
       - ./scripts:/scripts:ro
+
+  bookingcom-availability:
+    <<: *base
+    image: loadimpact/k6
+    network_mode: host
+    command: "run /scripts/bookingcom-availability.js"
+    volumes:
+      - ./scripts:/scripts:ro

@@ -8,3 +8,5 @@ So, no easy way to import npm modules or libraries using NodeJS APIs.
 ## Executing
 
 `docker-compose run --rm search-api`
+
+`docker-compose run --rm bookingcom-availability`

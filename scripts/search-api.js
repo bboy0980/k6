@@ -4,17 +4,24 @@ import { Rate } from 'k6/metrics';
 import urlencode from 'https://jslib.k6.io/form-urlencoded/3.0.0/index.js';
 
 export let options = {
-  stages: [
-    { duration: '5m', target: 50 }, // simulate ramp-up of traffic from 1 to 50 users over 5 minutes.
-    { duration: '10m', target: 50 }, // stay at 50 users for 10 minutes
-    { duration: '5m', target: 0 }, // ramp-down to 0 users
-  ],
-  gracefulRampDown: '60s',
+  discardResponseBodies: false,
+  scenarios: {
+    searches: {
+      executor: 'ramping-vus',
+      stages: [
+        { duration: '3m', target: 20 }, // simulate ramp-up of traffic from 1 to 50 users over 5 minutes.
+        { duration: '7m', target: 20 }, // stay at 50 users for 10 minutes
+        { duration: '3m', target: 0 }, // ramp-down to 0 users
+      ],
+      gracefulRampDown: '60s',
+      gracefulStop: '60s'
+    }
+  },
   thresholds: {
     http_req_duration: ['p(99)<50000'], // 99% of requests must complete below 50s
     errors: ['rate<0.01'], // <1% errors
-    hotels: ['rate>0'], // hotels availability always>0
-  },
+    hotels: ['rate=0'], // hotels availability always>0
+  }
 };
 
 const BASE_URL = 'https://search-api-preprod.staybonanza.com/api/v3/hotels';
@@ -84,18 +91,28 @@ export default () => {
     let hotelsCheck = check(hotelObjects, { 'hotels available': (obj) => obj['hotels']['data'].length > 0 });
     hotelsRate.add(hotelsCheck);
 
-    if (hotelObjects['hotels']['pagination']['last_page'] > 1) {
-      for (let page = 2; page < hotelObjects['hotels']['pagination']['last_page'] - 1; page++) {
-        dateParams = Object.assign(dateParams, { page: page });
-        hotelsParams = Object.assign(dateParams, BASE_PARAMS);
-        hotelObjects = http.get(`${BASE_URL}?${urlencode(hotelsParams)}`).json();
+    // if (!hotelsCheck) {
+    //   console.log('URL1', `${BASE_URL}?${urlencode(hotelsParams)}`);
+    //   console.log('R1', JSON.stringify(hotelObjects));
+    // }
 
-        // console.log('F2', JSON.stringify(dateParams));
+    // if (hotelObjects['hotels']['pagination']['last_page'] > 1) {
+    //   for (let page = 2; page < hotelObjects['hotels']['pagination']['last_page']; page++) {
+    //     dateParams = Object.assign(dateParams, { page: page });
+    //     hotelsParams = Object.assign(dateParams, BASE_PARAMS);
+    //     hotelObjects = http.get(`${BASE_URL}?${urlencode(hotelsParams)}`).json();
 
-        hotelsCheck = check(hotelObjects, { 'hotels available': (obj) => obj['hotels']['data'].length > 0 });
-        hotelsRate.add(hotelsCheck);
-      }
-    }
+    //     console.log('F2', JSON.stringify(dateParams));
+
+    //     hotelsCheck = check(hotelObjects, { 'hotels available': (obj) => obj['hotels']['data'].length > 0 });
+    //     hotelsRate.add(hotelsCheck);
+
+    //     if (!hotelsCheck) {
+    //       console.log('URL2', `${BASE_URL}?${urlencode(hotelsParams)}`);
+    //       console.log('R2', JSON.stringify(hotelObjects));
+    //     }
+    //   }
+    // }
   }
 
   sleep(1);

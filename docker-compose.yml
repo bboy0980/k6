@@ -22,3 +22,11 @@ services:
     command: "run /scripts/bookingcom-availability.js"
     volumes:
       - ./scripts:/scripts:ro
+
+  gphub-api:
+    <<: *base
+    image: loadimpact/k6
+    network_mode: host
+    command: "run /scripts/gphub-api.js"
+    volumes:
+      - ./scripts:/scripts:ro

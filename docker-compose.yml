@@ -1,32 +1,29 @@
 version: "3.4"
 
 x-base: &base
+  image: loadimpact/k6
   stdin_open: true
   tty: true
+  env_file: .env
+  network_mode: host
   tmpfs:
     - /tmp
+  volumes:
+    - ./scripts:/scripts:ro
 
 services:
   search-api:
     <<: *base
-    image: loadimpact/k6
-    network_mode: host
     command: "run /scripts/search-api.js"
-    volumes:
-      - ./scripts:/scripts:ro
 
   bookingcom-availability:
     <<: *base
-    image: loadimpact/k6
-    network_mode: host
     command: "run /scripts/bookingcom-availability.js"
-    volumes:
-      - ./scripts:/scripts:ro
 
   gphub-api:
     <<: *base
-    image: loadimpact/k6
-    network_mode: host
     command: "run /scripts/gphub-api.js"
-    volumes:
-      - ./scripts:/scripts:ro
+
+  ratehawk-api:
+    <<: *base
+    command: "run /scripts/ratehawk-api.js"

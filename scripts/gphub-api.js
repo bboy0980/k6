@@ -1,7 +1,6 @@
 import http from 'k6/http';
 import { check, group, sleep } from 'k6';
 import { Rate } from 'k6/metrics';
-import urlencode from 'https://jslib.k6.io/form-urlencoded/3.0.0/index.js';
 
 export let options = {
     discardResponseBodies: false,
@@ -9,8 +8,8 @@ export let options = {
         searches: {
             executor: 'ramping-vus',
             stages: [
-                { duration: '3m', target: 100 }, // simulate ramp-up of traffic from 1 to 100 users over 3 minutes.
-                { duration: '7m', target: 100 }, // stay at 100 users for 7 minutes
+                { duration: '3m', target: 50 }, // simulate ramp-up of traffic from 1 to 100 users over 3 minutes.
+                { duration: '7m', target: 50 }, // stay at 100 users for 7 minutes
                 { duration: '2m', target: 0 }, // ramp-down to 0 users
             ],
             gracefulRampDown: '60s',
